@@ -6,8 +6,8 @@
 
 Function listaDiretorioRecursivo {
     Param($lista, $caminho, $array)
-    $caminho = $lista.Path    
-    echo $caminho
+    $caminho = $lista.Path
+    Write-Output $caminho
     ForEach($item in $caminho) {
         if ($caminho) {
             Write-Output $path.Substring( $path.LastIndexOf('\')[0])
@@ -16,6 +16,6 @@ Function listaDiretorioRecursivo {
         #$array += $childrens
         #listaDiretorioRecursivo($childrens, "$caminho$pasta", $array)
     }
-} 
+}
 
 listaDiretorios
