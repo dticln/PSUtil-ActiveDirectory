@@ -35,7 +35,7 @@ Function executaScript {
             if ($nomeNac  -notlike "*$patrimonio") {
                 $erros += erroPatrimonio $nomeNac
             }
-            $computadores = $litoral | Where-Object {$_.Name -Like "*$patrimonio"}
+            $computadores = $litoral | Where-Object {$_.Name -Like "*$patrimonio" -and $_.Enabled -eq $true}
             $count = $computadores.Count
             if ($count -ge 1) {
                 $erros += erroDuplicatas $nomeNac $computadores
