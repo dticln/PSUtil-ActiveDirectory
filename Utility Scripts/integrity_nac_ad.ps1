@@ -7,12 +7,20 @@
 # obtidos através do domínio ad.ufrgs.br/litoral e os relatórios gerados pelo sistema NAC.
 # Verificando problemas com erro no registro do patrimonio, duplicatas, registros incompatíveis,
 # unidade organizacional incorreta e computadores patrimoniados sem registro.
+##############################
+
+##############################
+#.SYNOPSIS
+# Inicio do script de verificação de erros entre registros AD e relatórios NAC
+#
+#.DESCRIPTION
+# Função com a lógica de verificação para cada patrimonio na lista do NAC
 #
 #.PARAMETER listaIps
 # Nome da lista do NAC em formato .xls
 #
 #.EXAMPLE
-# executaScript 'listagem_ips.xls'
+# executaScript 'nome_do_arquivo.xls'
 #
 #.NOTES
 # A ordem das construções lógicas impactam nos registros de erros, certos erros podem ser 
@@ -28,7 +36,7 @@ Function executaScript {
     # Para cada patrimonio na lista, faça:
     for($i = 2; $planinha.Cells.Item($i,5).Value(); $i++) {
         $patrimonio = $planinha.Cells.Item($i,5).Value()
-        if($patrimonio -ne "-"){        
+        if($patrimonio -ne "-"){
             # Lógica interna do script, pode ser alterada
             # para obter relatórios diferentes
             $nomeNac = $planinha.Cells.Item($i,2).Value().ToUpper()
@@ -280,4 +288,5 @@ Function finalizar {
 
 # Ponto de entrada do script
 Clear-Host
-executaScript 'listagem_ips.xls'
+$arquivo = Read-Host -Prompt 'Digite o nome do relatório do NAC que deseja analisar'
+executaScript $arquivo

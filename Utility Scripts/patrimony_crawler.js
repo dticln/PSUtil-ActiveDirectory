@@ -59,20 +59,22 @@ function executeCrawling(){
             if (elements.find("p:contains('Responsável:')").length > 0) {
                 var resp = findDataByContent(elements, 'Responsável:');
                 var coresp = findDataByContent(elements, 'Co-Responsável:');
+                var machineId = findDataByContent(elements, 'Patrimônio:');
             } else {
                 var resp = '-';
                 var coresp = '-';
+                var machineId = '-';
             }
             var desc = createDescription(user, resp, coresp)
 
             console.log('- ' + desc);
-            data.push(ipv4List[index] + ';' + user + ';' + resp + ';' + coresp + ';' + desc)
+            data.push(ipv4List[index] + ';' + machineId + ';' + user + ';' + resp + ';' + coresp + ';' + desc)
             index++;
 
             if (index < ipv4List.length) {
                 loadDetailPage(ipv4List, index);
             } else {
-                var csv = 'IPV4;USUÁRIO DO NAC;RESPONSÁVEL PATRIMONIAL;CO-RESPONSÁVEL PATRIMONIAL;ESTADO\n';
+                var csv = 'IPV4;PATRIMÔNIO;USUÁRIO DO NAC;RESPONSÁVEL PATRIMONIAL;CO-RESPONSÁVEL PATRIMONIAL;ESTADO\n';
                 for(var i in data) {
                     csv += data[i] + '\n';
                 }
