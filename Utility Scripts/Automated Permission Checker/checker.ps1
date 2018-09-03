@@ -118,16 +118,20 @@ Function Get-ListFromDepartment {
 Cria tabela HTML a partir de Grupo
 
 .DESCRIPTION
-Long description
+Cria tabela HTML a partir de um Grupo. Em um primeiro momento, verifica-se a existência de usuários 
+no grupo: caso haja, serão listados em formato de células. A função faz chamados recursivos para cada subgrupo.
+A diversas tabelas geradas são concatenadas e retornadas em formato de texto (HTML). 
 
 .PARAMETER groups
-Parameter description
+Grupo inicial e subgrupos das chamadas recursivas
 
 .EXAMPLE
-An example
+$htmlText = Convert-GroupToTable $groups
 
 .NOTES
-General notes
+Há uma verificação manual para grupos definidos pelo CPD. É realizado um match no padrão:
+'([G])[0-9]{5}\w+'. Exemplo: G12345
+A função necessita dos layouts: table-header, table-cell e table.
 #>
 Function Convert-GroupToTable {
     Param($groups)
@@ -164,19 +168,22 @@ Function Convert-GroupToTable {
 
 <#
 .SYNOPSIS
-Short description
+Cria tabela HTML a partir de de uma lista de Permissões
 
 .DESCRIPTION
-Long description
+Cria uma tabela HTML a uma lista de permissões manuais atribuídas a um determinado setor.
+Para cada usuário, verifica-se o número de permissões manuais na pasta do setor. Caso haja 
+mais de 10 registros manuais, a tabela constará com o aviso de múltiplos registros.
+Caso contário, serão listados os registros de cada usuário.
 
 .PARAMETER permissions
-Parameter description
+Lista de permissões manuais geradas pela função Set-ManualPermission.
 
 .EXAMPLE
-An example
+$htmlText = Convert-PermissionToTable $permissions
 
 .NOTES
-General notes
+Essa função necessita do layouts: table-header, table-cell-permission e table
 #>
 Function Convert-PermissionToTable {
     Param($permissions) 
@@ -216,19 +223,27 @@ Function Convert-PermissionToTable {
 
 <#
 .SYNOPSIS
-Short description
+Recupera informações de permissões manuais inseridas nas pastas.
 
 .DESCRIPTION
-Long description
+Recupera uma lista de permissões inseridas de forma manual.
+A função tem como lógica, filtrar todas as permissões de uma pasta e subpastas.
+O filtro segue a lógica: caso a permissão dê match com 'AD\\[0-9]{8}' e a permissão 
+não seja do criador da pasta, adiciona-se uma lista de permissões desse usuário em 
+uma lista geral. Para cada registro de pasta com permissõa manual, um novo item é 
+adicionado na lista do usuário.
+Os resultados são reagrupados utilizando a função Group-Permission: as listas 
+de cada usuário são desfeitas e transformadasem uma grande lista. 
 
 .PARAMETER folder
-Parameter description
+Pasta raíz da verificação de permissão. Por padrão, utiliza-se \\ad.ufrgs.br\LITORAL
 
 .EXAMPLE
-An example
+$permissions = Find-ManualPermission '\\ad.ufrgs.br\LITORAL'
 
 .NOTES
-General notes
+A função pode disparar uma exceção que finaliza a execução do programa.
+A causa mais provável é a falta de credenciais para o acesso.
 #>
 Function Find-ManualPermission {
     Param($folder)
@@ -270,19 +285,20 @@ Function Find-ManualPermission {
 
 <#
 .SYNOPSIS
-Short description
+Reagrupa as listas de permissões em uma lista única.
 
 .DESCRIPTION
-Long description
+Reagrupa as listas de permissões de cada usuário em uma lista única.
+Gera uma lista objetos Permissão.
 
 .PARAMETER registries
-Parameter description
+Registros gerados pela primeira parte da função Find-ManualPermission.
 
 .EXAMPLE
-An example
+return Group-Permission $registries
 
 .NOTES
-General notes
+O resultado da função é uma lista de objetos: [PSCustomObject]@{ Cartao, Nome, Local }
 #>
 Function Group-Permission {
     Param($registries)
@@ -311,25 +327,53 @@ Function Group-Permission {
 
 <#
 .SYNOPSIS
-Short description
+Determina qual setor que deve ser responsabilizado por terminadas permissões.
 
 .DESCRIPTION
-Long description
+Determina qual setor deve receber a lista de permissões manuais para a verificação.
+Na lista de permissões geradas pela função Group-Permission, verifica-se a qual
+OU é mais aconselhada a responsabilização. Uma vez que existe uma hierarquia,
+caso essa função não exista, qualquer um dentro da hierarquia poderia receber o pedido
+de confirmação de permissão em uma pasta subordinada.
 
 .PARAMETER permissions
-Parameter description
+Lista de permissões geradas pro Group-Permission.
 
 .PARAMETER base
-Parameter description
+Pasta raíz de um setor dentro da hierarquia. 
+Exemplo: \\ad.ufrgs.br\LITORAL\Direção\Núcleo\Divisão
 
 .PARAMETER references
-Parameter description
+Lista com todas as raízes dos demais setores.
 
 .EXAMPLE
-An example
+$departmentPermission = Set-ManualPermission $manual $department.Pasta $departmentList
 
 .NOTES
-General notes
+A definição de setor responsável pela permissão é feita pela adição da propriedade
+"Attributed" ao objeto de permissão. Procura-se o $bestMatch verificando 
+se a pasta da permissão possui a substring de uma referência ($references).
+Quanto maior o número de caracteres daqueles que passaram pelo teste da substring,
+mais completo é o caminho da pasta. 
+
+Ou seja, para a pasta: 
+'\\ad.ufrgs.br\LITORAL\Direção\Núcleo\Divisão\Relatório'
+
+Tento a lista $references: 
+{
+    '\\ad.ufrgs.br\LITORAL\Direção\Núcleo de Avaliação',
+    '\\ad.ufrgs.br\LITORAL\Direção\Núcleo',
+    '\\ad.ufrgs.br\LITORAL\Direção\Núcleo\Divisão'
+}
+
+E a base: 
+{ 
+    \\ad.ufrgs.br\LITORAL\Direção\Núcleo\Divisão
+}
+
+A melhor opção de atribuição é o terceiro item do array.
+Perceba que sem essa função, a permissão poderia ser atribuída ao
+segundo item do array.
 #>
 Function Set-ManualPermission {
     Param($permissions, $base, $references)
@@ -362,19 +406,29 @@ Function Set-ManualPermission {
 
 <#
 .SYNOPSIS
-Short description
+Função com a lógica principal do programa.
 
 .DESCRIPTION
-Long description
+O programa executa a verificação de permissões das pastas departamentais da unidade.
+Para que o script funcione de forma apropriada, é necessário seguir o padrão de organização
+proposto pelo manual do CPD e do Active Directory.
+O script pode ser adaptado para operar em outros ambientes.
+
+Para a execução, é necessário gerar uma lista com os setores (para mais informações, ver: Get-DepartmentFromFile).
+
+Verifica-se as informações de permissões manuais na pasta raíz da unidade.
+É realizada a atribuição de permissões por setor e a listagem de todos os usuários
+que possuem acesso à pasta do setor, distribuído em seus respectivos grupos.
+
+O objetivo do script é gerar e-mails para todos os setores.
+Esses e-mails serão armazenados na pasta "arquivo" e podem ser enviados automaticamente,
+utilizando a opção $sendEmail.
 
 .PARAMETER sendEmail
-Parameter description
+Permite o envio automatizado de e-mails para os setores.
 
 .EXAMPLE
-An example
-
-.NOTES
-General notes
+Start-Program $true
 #>
 Function Start-Program {
     Param($sendEmail = $false)
