@@ -1,5 +1,22 @@
 ﻿Import-Module '.\util.ps1'
 
+<#
+.SYNOPSIS
+Recupera uma lista de departamentos de um arquivo excel.
+
+.DESCRIPTION
+Recupera uma lista de departamentos (Sigla, Nome, Responsável, Cartão UFRGS, E-mail, Pasta padrão)
+de um arquivo excel organizado em tabelas com esses campos.
+
+.PARAMETER filename
+Nome do arquivo onde estão as informações dos departamentos
+
+.NOTES
+O script foi configurado para coletar a informção 
+a partir da segunda linha da tabela.
+O retorno esperado é uma lista de Departamentos:
+[PSCustomObject]@{ Sigla, Nome, Responsavel, Cartao, Email, Pasta }
+#>
 Function Get-DepartmentFromFile {
     Param($filename)
     Begin {
@@ -35,6 +52,30 @@ Function Get-DepartmentFromFile {
     }
 }
 
+<#
+.SYNOPSIS
+Recupera uma lista de membros e subgrupos de um grupo
+
+.DESCRIPTION
+Recupera uma lista com membros e subgrupos de um grupo do Active Directory 
+a partir do seu nome 
+
+.PARAMETER department
+Nome do departamento que deseja realizar a recuperação de membros e subgrupos
+
+.PARAMETER useLimitator
+É possível utilizar o limitador "*Everyone" durante a pesquisa, realizando um filtro
+em possíveis subgrupos com everyone no nome.
+Essa opção é válida na estrutura de pastas utilizada pelo CLN
+
+.EXAMPLE
+Get-ListFromDepartment "LIT DGR Everyone" $true
+
+.NOTES
+Há uma chamada recursiva dessa função. Ela deve ter o "useLimitator" padrão: false.
+O resultado esperado da função é um Grupo:
+[PSCustomObject]@{ Nome, Descricao, Subgrupos, Usuarios }
+#>
 Function Get-ListFromDepartment {
     Param(
         $department,
@@ -72,6 +113,22 @@ Function Get-ListFromDepartment {
     End {}
 }
 
+<#
+.SYNOPSIS
+Cria tabela HTML a partir de Grupo
+
+.DESCRIPTION
+Long description
+
+.PARAMETER groups
+Parameter description
+
+.EXAMPLE
+An example
+
+.NOTES
+General notes
+#>
 Function Convert-GroupToTable {
     Param($groups)
     Begin {}
@@ -105,6 +162,22 @@ Function Convert-GroupToTable {
     End {}
 }
 
+<#
+.SYNOPSIS
+Short description
+
+.DESCRIPTION
+Long description
+
+.PARAMETER permissions
+Parameter description
+
+.EXAMPLE
+An example
+
+.NOTES
+General notes
+#>
 Function Convert-PermissionToTable {
     Param($permissions) 
     Begin {}
@@ -141,6 +214,22 @@ Function Convert-PermissionToTable {
     End {}
 }
 
+<#
+.SYNOPSIS
+Short description
+
+.DESCRIPTION
+Long description
+
+.PARAMETER folder
+Parameter description
+
+.EXAMPLE
+An example
+
+.NOTES
+General notes
+#>
 Function Find-ManualPermission {
     Param($folder)
     Begin {
@@ -179,6 +268,22 @@ Function Find-ManualPermission {
     End {}
 }
 
+<#
+.SYNOPSIS
+Short description
+
+.DESCRIPTION
+Long description
+
+.PARAMETER registries
+Parameter description
+
+.EXAMPLE
+An example
+
+.NOTES
+General notes
+#>
 Function Group-Permission {
     Param($registries)
     Begin {
@@ -204,6 +309,28 @@ Function Group-Permission {
     End {}
 }
 
+<#
+.SYNOPSIS
+Short description
+
+.DESCRIPTION
+Long description
+
+.PARAMETER permissions
+Parameter description
+
+.PARAMETER base
+Parameter description
+
+.PARAMETER references
+Parameter description
+
+.EXAMPLE
+An example
+
+.NOTES
+General notes
+#>
 Function Set-ManualPermission {
     Param($permissions, $base, $references)
     Begin {}
@@ -233,6 +360,22 @@ Function Set-ManualPermission {
     End {}
 }
 
+<#
+.SYNOPSIS
+Short description
+
+.DESCRIPTION
+Long description
+
+.PARAMETER sendEmail
+Parameter description
+
+.EXAMPLE
+An example
+
+.NOTES
+General notes
+#>
 Function Start-Program {
     Param($sendEmail = $false)
     Begin {}
