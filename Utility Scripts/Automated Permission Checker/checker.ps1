@@ -783,12 +783,10 @@ Function Start-Program {
                         groups      = $groupTable
                         permissions = $permissionTable
                         department = $department.Nome
-                        folder = $departments.Pasta
+                        folder = $department.Pasta
                     }
                     $file = "$PSScriptRoot\arquivo\$initials.html"
                     $email | Out-File $file -Encoding UTF8 
-                    ##.TODO
-                    # DEFINIR CORPO DO E-MAIL
                     If ($sendEmail) {
                         Write-Host "Enviando e-mail de confirmação para: $($department.Email)."
                         Send-Email $department.Email 'Verificação de permissões' $file $credencial $false
@@ -805,14 +803,16 @@ Function Start-Program {
                     Write-Output "Analisando duplicatas para $initials."
                     $departmentDuplicated = Set-ObjectToDepartment $duplicated $department.Pasta $departments.Pasta
                     If ($departmentDuplicated.Count -gt 0) {
-                        $body = Get-Layout 'e-mail-duplicated' @{ 
+                        $attachment = Export-DuplicatedFiles $departmentDuplicated $initials
+                        $email = Get-Layout 'e-mail-duplicated' @{ 
                             department = $department.Nome
-                            folder = $departments.Pasta
+                            folder = $department.Pasta
                         }
-                        $file = Export-DuplicatedFiles $departmentDuplicated $initials
+                        $folder = "$PSScriptRoot\arquivo\$initials.html"
+                        $email | Out-File $folder -Encoding UTF8 
                         If ($sendEmail) {
                             Write-Host "Enviando e-mail de duplicatas para: $($department.Email)."
-                            Send-Email $department.Email 'Relatório de duplicatas' $body $credencial $file
+                            Send-Email $department.Email 'Relatório de duplicatas' $folder $credencial $attachment
                         }
                     }
                 }
@@ -826,12 +826,16 @@ Function Start-Program {
                     Write-Output "Analisando os maiores arquivos para $initials."
                     $departmentLarge = Set-ObjectToDepartment $large $department.Pasta $departments.Pasta
                     If ($departmentLarge.Count -gt 0) {
-                        $file = Export-LargeFiles $departmentLarge $initials
-                        ##.TODO
-                        # DEFINIR CORPO DO E-MAIL
+                        $attachment = Export-LargeFiles $departmentLarge $initials
+                        $email = Get-Layout 'e-mail-large' @{
+                            department = $department.Nome
+                            folder = $department.Pasta
+                        }
+                        $folder = "$PSScriptRoot\arquivo\$initials.html"
+                        $email | Out-File $folder -Encoding UTF8
                         If ($sendEmail) {
                             Write-Host "Enviando e-mail de maiores arquivos para: $($department.Email)."
-                            Send-Email $department.Email 'Relatório de maiores arquivos' 'body' $credencial $file
+                            Send-Email $department.Email 'Relatório de maiores arquivos' $folder $credencial $attachment
                         }
                     }
                 }

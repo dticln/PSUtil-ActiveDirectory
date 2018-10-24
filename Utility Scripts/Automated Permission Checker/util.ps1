@@ -86,14 +86,14 @@ Function Send-Email {
         $attachments = $false
     )
     Try {
-        $From = "info-ticln@ufrgs.br"
+        $From = "[Não responda] Informações DTICLN <info-ticln@ufrgs.br>"
         $To = $to
-        $Subject = "[NÃO RESPONDA] $title"
-        $Body = Get-Content -Path $html -Encoding UTF8 | Out-String
+        $Subject = "[Não responda] $title"
+        $Body = Get-Content -Path $html | Out-String
         $SMTPServer = "smtp.ufrgs.br"
         $SMTPPort = "587"
         If ($attachments) {
-            Send-MailMessage -From $From -to $To -Subject $Subject -Body $Body -BodyAsHtml -Attachments $attachments -SmtpServer $SMTPServer -port $SMTPPort -UseSsl -Credential $user –DeliveryNotificationOption OnSuccess -Encoding UTF8 
+            Send-MailMessage -From $From -to $To -Attachments $attachments -Subject $Subject -Body $Body -BodyAsHtml -SmtpServer $SMTPServer -port $SMTPPort -UseSsl -Credential $user –DeliveryNotificationOption OnSuccess -Encoding UTF8 
         }
         Else {
             Send-MailMessage -From $From -to $To -Subject $Subject -Body $Body -BodyAsHtml -SmtpServer $SMTPServer -port $SMTPPort -UseSsl -Credential $user –DeliveryNotificationOption OnSuccess -Encoding UTF8 
@@ -161,7 +161,7 @@ Function Get-Layout {
     Try {
         $content = Get-Content -Encoding UTF8 -Path "$PSScriptRoot\layout\$name.html"
         Foreach ($key in $yields.Keys) {
-            $content = $content -Replace ":$($key):$", $yields[$key]
+            $content = $content -Replace ":$($key):", $yields[$key]
         }
         return $content
     }
