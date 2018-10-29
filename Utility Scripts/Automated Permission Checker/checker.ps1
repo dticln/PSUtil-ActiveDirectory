@@ -546,7 +546,7 @@ Function Export-LargeFiles {
         }  
     }
     End {
-        Write-Host "Relatório de duplicatas salvo em '$name.xlsx'."
+        Write-Host "Relatório de maiores arquivos salvo em '$name.xlsx'."
     }
 }
 
@@ -802,17 +802,23 @@ Function Start-Program {
                     $initials = $department.Sigla.trim()
                     Write-Output "Analisando duplicatas para $initials."
                     $departmentDuplicated = Set-ObjectToDepartment $duplicated $department.Pasta $departments.Pasta
+                    $department | Add-Member Attachment $false
                     If ($departmentDuplicated.Count -gt 0) {
-                        $attachment = Export-DuplicatedFiles $departmentDuplicated $initials
+                        $department.Attachment = Export-DuplicatedFiles $departmentDuplicated $initials
                         $email = Get-Layout 'e-mail-duplicated' @{ 
                             department = $department.Nome
                             folder = $department.Pasta
                         }
-                        $folder = "$PSScriptRoot\arquivo\$initials.html"
-                        $email | Out-File $folder -Encoding UTF8 
-                        If ($sendEmail) {
+                        $email | Out-File "$PSScriptRoot\arquivo\$initials.html" -Encoding UTF8 
+                    }
+                }
+                # O processo de envio de e-mails foi retirado o laço principal 
+                If ($sendEmail) {
+                    Foreach ($department In $departments) {
+                        If ($department.Attachment -ne $false){
                             Write-Host "Enviando e-mail de duplicatas para: $($department.Email)."
-                            Send-Email $department.Email 'Relatório de duplicatas' $folder $credencial $attachment
+                            $initials = $department.Sigla.trim()
+                            Send-Email $department.Email 'Relatório de duplicatas' "$PSScriptRoot\arquivo\$initials.html" $credencial $department.Attachment
                         }
                     }
                 }
@@ -825,17 +831,23 @@ Function Start-Program {
                     $initials = $department.Sigla.trim()
                     Write-Output "Analisando os maiores arquivos para $initials."
                     $departmentLarge = Set-ObjectToDepartment $large $department.Pasta $departments.Pasta
+                    $department | Add-Member Attachment $false
                     If ($departmentLarge.Count -gt 0) {
-                        $attachment = Export-LargeFiles $departmentLarge $initials
+                        $department.Attachment = Export-LargeFiles $departmentLarge $initials
                         $email = Get-Layout 'e-mail-large' @{
                             department = $department.Nome
                             folder = $department.Pasta
                         }
-                        $folder = "$PSScriptRoot\arquivo\$initials.html"
-                        $email | Out-File $folder -Encoding UTF8
-                        If ($sendEmail) {
+                        $email | Out-File "$PSScriptRoot\arquivo\$initials.html" -Encoding UTF8
+                    }
+                }
+                # O processo de envio de e-mails foi retirado o laço principal 
+                If ($sendEmail) {
+                    Foreach ($department In $departments) {
+                        If ($department.Attachment -ne $false){
                             Write-Host "Enviando e-mail de maiores arquivos para: $($department.Email)."
-                            Send-Email $department.Email 'Relatório de maiores arquivos' $folder $credencial $attachment
+                            $initials = $department.Sigla.trim()
+                            Send-Email $department.Email 'Relatório de maiores arquivos' "$PSScriptRoot\arquivo\$initials.html" $credencial $department.Attachment
                         }
                     }
                 }
