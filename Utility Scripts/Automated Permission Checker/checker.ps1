@@ -508,7 +508,7 @@ Limite de gravação no arquivo Excel. O número de itens nessa lista pode ser e
 o que obriga a gerar um arquivo mais palpável para os usuários finais.
 
 .EXAMPLE
-Export-LargeFiles $list 'LIT DGR ADG' 150
+Export-LargeFiles $list 'LIT DGR ADG' 10
 
 .NOTES
 Para exportar os dados a função utiliza a biblioteca do Excel
@@ -517,7 +517,7 @@ Function Export-LargeFiles {
     Param (
         $list,
         $name,
-        $limit = 100
+        $limit = 15
     )
     Begin {}
     Process {
@@ -872,7 +872,7 @@ Function Show-Label {
     Write-Host "| Script de verificação automatizada do Active Directory |"
     Write-Host "=========================================================="
     Write-Host "|          Divisão de Tecnologia da Informação           |"
-    Write-Host "|                   Versão: 1.0.0.0                      |"
+    Write-Host "|                   Versão: 1.2.0.0                      |"
     Write-Host "=========================================================="
 }
 
