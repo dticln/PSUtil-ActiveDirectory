@@ -370,7 +370,8 @@ Function Find-DuplicatedFiles {
                     $found[$hash.Hash] += $item
                     $double = $hash.Hash
                     $duplicated = $found[$hash.Hash]
-                    Write-Host "O arquivo '$double' está presente em $($duplicated.Length) diretórios."
+                    Write-Host "O arquivo '$($double.Substring(0, 10))' está presente em $($duplicated.Length) diretórios:"
+                    Write-Host "Último registro em '$($item.FullName)'."
                 }
             } 
         }
@@ -460,12 +461,19 @@ Function Export-DuplicatedFiles {
             $table.Cells.Item(1, 1) = 'Identificador único'
             $table.Cells.Item(1, 2) = 'Nome do arquivo'
             $table.Cells.Item(1, 3) = 'Caminho'
+            $table.Cells.Item(1, 4) = 'Observação'
             $i = 2
             $lastHash = $list[0]
             Foreach ($item In $list) {
                 $table.Cells.Item($i, 1) = $item.HashID
                 $table.Cells.Item($i, 2) = $item.Nome
                 $table.Cells.Item($i, 3) = $item.Local
+                $count = @($list | Where-Object { $_.HashID -like $item.HashID }).Count
+                if ($count -eq 1) {
+                    $table.Cells.Item($i, 4) = 'O arquivo também está presente em pastas de outros setores.'
+                } else {
+                    $table.Cells.Item($i, 4) = 'Este arquivo está duplicado na pasta do seu setor.'
+                }
                 If ($lastHash -ne $item.HashID) {
                     $curColor = @{$true = $gray; $false = $lowGray}[$curColor -eq $lowGray]
                 }
@@ -473,6 +481,7 @@ Function Export-DuplicatedFiles {
                 $table.Cells.Item($i, 1).Interior.Color = $curColor
                 $table.Cells.Item($i, 2).Interior.Color = $curColor
                 $table.Cells.Item($i, 3).Interior.Color = $curColor
+                $table.Cells.Item($i, 4).Interior.Color = $curColor
                 $i++
             }
             $folder.SaveAs("$PSScriptRoot\arquivo\$name.xlsx")
@@ -798,6 +807,7 @@ Function Start-Program {
                 Write-Output "*ATENÇÃO: A verificação de duplicatas pode demorar um grande período de tempo."
                 $in = Read-HostWithDefault 'Qual a pasta que será utilizada como referência?' '\\ad.ufrgs.br\LITORAL' 
                 $duplicated = Find-DuplicatedFiles  $in
+                Export-DuplicatedFiles $duplicated 'Relatório-Geral'
                 Foreach ($department In $departments) {
                     $initials = $department.Sigla.trim()
                     Write-Output "Analisando duplicatas para $initials."
