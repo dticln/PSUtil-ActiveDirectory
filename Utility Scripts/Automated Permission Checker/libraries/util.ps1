@@ -18,10 +18,12 @@ O retorno de dois objetos pode ser algo perigoso,
 mas pareceu util utiliza-lo nessa função.
 #>
 Function Open-Excel {
-    Param($filename)
+	Param($filename)
+
     try {
         $excel = New-Object -com 'excel.application'
-        $folder = $excel.Workbooks.Open("$PSScriptRoot\$filename")
+
+        $folder = $excel.Workbooks.Open("$root$filename")
         return $excel, $folder
     }
     catch {
@@ -159,7 +161,8 @@ de e-mails.
 Function Get-Layout {
     Param($name, $yields = @{})
     Try {
-        $content = Get-Content -Encoding UTF8 -Path "$PSScriptRoot\layout\$name.html"
+		$root = $PSScriptRoot.Substring(0, ($PSScriptRoot.Length - 9))
+        $content = Get-Content -Encoding UTF8 -Path "$root\layout\$name.html" <#ajustar parâmetros #>
         Foreach ($key in $yields.Keys) {
             $content = $content -Replace ":$($key):", $yields[$key]
         }
