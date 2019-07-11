@@ -31,11 +31,11 @@ The "files" folder is used for saving reports in HTML and XLSX format.
 About reference file:
 Verification and reporting requires a reference file with the information used by the script.
 The file must be accepted by Excel (which will execute the cells processing) and be in the format:
-  |   A      |      B      |      C       |    D        |   E    |       F       | 
+  |   A      |      B      |      C            |    D        |   E    |       F       | 
 --------------------------------------------------------------------------
-1 | Inicials |     Name    | Leader       | Card Number | E-mail |     Folder    | 
+1 | Acronym  |     Name    | Responsible       | Card Number | E-mail |    Default Folder    | 
 --------------------------------------------------------------------------
-2 | CLN      | Campus L... | Fulano de... |  12345      | ful... | \\ad.ufrgs... |
+2 | CLN      | Campus L... | Fulano de...      |  12345      | ful... | \\ad.ufrgs... |
 --------------------------------------------------------
 Bibliotecas e dependências:
 O Script presente nesse arquivo necessita da extensão Microsoft Active Directory, das bibliotecas de abertura de arquivos do Microsoft Office Excel e do arquivo util.ps1.
@@ -48,9 +48,9 @@ A verificação e geração de relatórios necessita de um arquivo de referênci
 O arquivo deve ser aceito pelo Excel (que executará o processamento das células) e estar no formato:
   |   A   |      B      |      C       |    D   |   E    |       F       | 
 --------------------------------------------------------------------------
-1 | Sigla |     Nome    | Responsável  | Cartão | E-mail |     Pasta     | 
+1 | Sigla |     Nome    | Responsável  | Cartão | E-mail | Pasta padrão     | 
 --------------------------------------------------------------------------
-2 | CLN   | Campus L... | Fulano de... |  12345 | ful... | \\ad.ufrgs... |
+2 | CLN   | Campus L... | Fulano de... |  12345 | ful... | \\ad.ufrgs...    |
 
 .NOTES
 Autor: Divisão de Tecnologia da Informação do Campus Litoral Norte.
@@ -65,29 +65,38 @@ https://github.com/dticln/PSUtil-ActiveDirectory
 
 
 <# 
-Importa arquivo com funções necessárias à abertura de arquivos Excel e ao envio de e-mails
---------------------------------------------------------
 Import file with required functions to open Excel files and send e-mails
+--------------------------------------------------------
+Importa arquivo com funções necessárias à abertura de arquivos Excel e ao envio de e-mails
 #>
 Import-Module '.\libraries\util.ps1'
 
 <#
 .SYNOPSIS
 Recupera uma lista de departamentos de um arquivo excel.
+--------------------------------------------------------
+Retrieves a list of departments from an excel file.
 
 .DESCRIPTION
-Recupera uma lista de departamentos (Sigla, Nome, Responsável, Cartão UFRGS, E-mail, Pasta padrão)
-de um arquivo excel organizado em tabelas com esses campos.
+Retrieve a list of departments (Acronym, Name, Responsible, Card Number, Email, Default Folder) of an excel file organized into tables with those fields.
+--------------------------------------------------------
+Recupera uma lista de departamentos (Sigla, Nome, Responsável, Número de Cartão, E-mail, Pasta Padrão) de um arquivo excel organizado em tabelas com esses campos.
 
 .PARAMETER filename
-Nome do arquivo onde estão as informações dos departamentos 
+File name where the department information is in.
+See: reference file, script synopsis.
+--------------------------------------------------------
+Nome do arquivo onde estão as informações dos departamentos. 
 Ver: arquivo de referência, sinopse do script.
 
 .NOTES
-O script foi configurado para coletar a informação 
-a partir da segunda linha da tabela.
+The script was configured to collect the information from the second row of the table forward.
+The expected return is a list of Departments:
+[PSCustomObject]@{Acronym, Name, Responsible, Card Number, Email, Default Folder}
+--------------------------------------------------------
+O script foi configurado para coletar a informação a partir da segunda linha da tabela.
 O retorno esperado é uma lista de Departamentos:
-[PSCustomObject]@{ Sigla, Nome, Responsavel, Cartao, Email, Pasta }
+[PSCustomObject]@{ Sigla, Nome, Responsavel, Número de Cartão, Email, Pasta Padrão }
 #>
 Function Get-DepartmentFromFile {
     Param($filename)
@@ -95,7 +104,8 @@ Function Get-DepartmentFromFile {
 		Write-Host "Tentando abrir arquivo $filename."
     }
     Process {
-        $departments = @()
+        <# Initializes variable with empty value / Inicializa a variável com valor vazio #>
+		$departments = @()
         Try {
 			$excel, $folder = Open-Excel "$PSScriptRoot\$filename" 
             $sheet = $folder.ActiveSheet
