@@ -31,11 +31,11 @@ The "files" folder is used for saving reports in HTML and XLSX format.
 About reference file:
 Verification and reporting requires a reference file with the information used by the script.
 The file must be accepted by Excel (which will execute the cells processing) and be in the format:
-  |   A      |      B      |      C            |    D        |   E    |       F       | 
+  |       A        |      B      |      C            |    D        |   E    |       F              | 
 --------------------------------------------------------------------------
-1 | Acronym  |     Name    | Responsible       | Card Number | E-mail |    Default Folder    | 
+1 | AD group name  |     Name    | Responsible       | Card Number | E-mail |    Default Folder    | 
 --------------------------------------------------------------------------
-2 | CLN      | Campus L... | Fulano de...      |  12345      | ful... | \\ad.ufrgs... |
+2 | LIT CLN        | Campus L... | Fulano de...      |  12345      | ful... |    \\ad.ufrgs...     |
 --------------------------------------------------------
 Bibliotecas e dependências:
 O Script presente nesse arquivo necessita da extensão Microsoft Active Directory, das bibliotecas de abertura de arquivos do Microsoft Office Excel e do arquivo util.ps1.
@@ -46,11 +46,11 @@ A pasta "files" é utilizada para salvamento dos relatórios em formato HTML e X
 Sobre o arquivo de referência:
 A verificação e geração de relatórios necessita de um arquivo de referência com as informações utilizadas pelo script para a execução.
 O arquivo deve ser aceito pelo Excel (que executará o processamento das células) e estar no formato:
-  |   A   |      B      |      C       |    D   |   E    |       F       | 
+  |   A              |      B      |      C       |    D   |   E    |       F          | 
 --------------------------------------------------------------------------
-1 | Sigla |     Nome    | Responsável  | Cartão | E-mail | Pasta padrão     | 
+1 | Nome do grupo AD |     Nome    | Responsável  | Cartão | E-mail | Pasta padrão     | 
 --------------------------------------------------------------------------
-2 | CLN   | Campus L... | Fulano de... |  12345 | ful... | \\ad.ufrgs...    |
+2 | LIT CLN          | Campus L... | Fulano de... |  12345 | ful... | \\ad.ufrgs...    |
 
 .NOTES
 Autor: Divisão de Tecnologia da Informação do Campus Litoral Norte.
@@ -73,14 +73,14 @@ Import-Module '.\libraries\util.ps1'
 
 <#
 .SYNOPSIS
-Recupera uma lista de departamentos de um arquivo excel.
+Retorna uma lista de departamentos extraída de um arquivo excel.
 --------------------------------------------------------
-Retrieves a list of departments from an excel file.
+Returns a list of departments extracted from an excel file.
 
 .DESCRIPTION
-Retrieve a list of departments (Acronym, Name, Responsible, Card Number, Email, Default Folder) of an excel file organized into tables with those fields.
+Retrieve a list of departments (AD group name, Name, Responsible, Card Number, Email, Default Folder) of an excel file organized into tables with those fields.
 --------------------------------------------------------
-Recupera uma lista de departamentos (Sigla, Nome, Responsável, Número de Cartão, E-mail, Pasta Padrão) de um arquivo excel organizado em tabelas com esses campos.
+Recupera uma lista de departamentos (Nome do grupo AD, Nome, Responsável, Número de Cartão, E-mail, Pasta Padrão) de um arquivo excel organizado em tabelas com esses campos.
 
 .PARAMETER filename
 File name where the department information is in.
@@ -92,11 +92,11 @@ Ver: arquivo de referência, sinopse do script.
 .NOTES
 The script was configured to collect the information from the second row of the table forward.
 The expected return is a list of Departments:
-[PSCustomObject]@{Acronym, Name, Responsible, Card Number, Email, Default Folder}
+[PSCustomObject]@{ AD group name, Name, Responsible, Card Number, Email, Default Folder}
 --------------------------------------------------------
 O script foi configurado para coletar a informação a partir da segunda linha da tabela.
 O retorno esperado é uma lista de Departamentos:
-[PSCustomObject]@{ Sigla, Nome, Responsavel, Número de Cartão, Email, Pasta Padrão }
+[PSCustomObject]@{ Nome do grupo AD, Nome, Responsavel, Número de Cartão, Email, Pasta Padrão }
 #>
 Function Get-DepartmentFromFile {
     Param($filename)
@@ -106,7 +106,9 @@ Function Get-DepartmentFromFile {
     Process {
         <# Initializes variable with empty value / Inicializa a variável com valor vazio #>
 		$departments = @()
-        Try {
+        
+		<# Open the department list (Excel file) / Abre a lista de departamentos (arquivo Excel) #>
+		Try {
 			$excel, $folder = Open-Excel "$PSScriptRoot\$filename" 
             $sheet = $folder.ActiveSheet
         }
@@ -115,9 +117,11 @@ Function Get-DepartmentFromFile {
             $excel.Quit()
             Exit-Program
         }
-       For ($i = 2; $sheet.Cells.Item($i, 1).Value(); $i++) {
+       
+	   <# Variable receives data from department list / Variável recebe dados da lista de departamentos #>
+	   For ($i = 2; $sheet.Cells.Item($i, 1).Value(); $i++) {
             $department = [PSCustomObject]@{
-                Sigla       = $sheet.Cells.Item($i, 1).Value()
+                GrupoAD     = $sheet.Cells.Item($i, 1).Value()
                 Nome        = $sheet.Cells.Item($i, 2).Value()
                 Responsavel = $sheet.Cells.Item($i, 3).Value()
                 Cartao      = $sheet.Cells.Item($i, 4).Value()
@@ -126,13 +130,21 @@ Function Get-DepartmentFromFile {
             }
             $departments += $department
         }
-        $excel.Quit()
-        return $departments
+        
+		<# Close Excel / Fecha Excel #>
+		$excel.Quit()
+        
+		<# Retorna variável com dados dos departamentos / Returns variable with department data #>
+		return $departments
     }
     End {
         Write-Host "Lista de setores aberta. Iniciando processo de verificação."
     }
 }
+
+
+
+
 
 <#
 .SYNOPSIS
@@ -818,7 +830,7 @@ Function Start-Program {
                     $manual = Find-ManualPermission $in
                 }
                 Foreach ($department In $departments) {
-                    $initials = $department.Sigla.trim()
+                    $initials = $department.GrupoAD.trim()
                     Write-Host "Verificando estrutura do setor $initials."
                     $groups = Get-ListFromDepartment "$initials Everyone" $true
                     $groupTable = Convert-GroupToTable $groups
@@ -850,7 +862,7 @@ Function Start-Program {
                 $duplicated = Find-DuplicatedFiles  $in
                 Export-DuplicatedFiles $duplicated 'Relatório-Geral'
                 Foreach ($department In $departments) {
-                    $initials = $department.Sigla.trim()
+                    $initials = $department.GrupoAD.trim()
                     Write-Output "Analisando duplicatas para $initials."
                     $departmentDuplicated = Set-ObjectToDepartment $duplicated $department.Pasta $departments.Pasta
                     $department | Add-Member Attachment $false
@@ -868,7 +880,7 @@ Function Start-Program {
                     Foreach ($department In $departments) {
                         If ($department.Attachment -ne $false){
                             Write-Host "Enviando e-mail de duplicatas para: $($department.Email)."
-                            $initials = $department.Sigla.trim()
+                            $initials = $department.GrupoAD.trim()
                             Send-Email $department.Email 'Relatório de duplicatas' "$PSScriptRoot\files\$initials.html" $credencial $department.Attachment
                         }
                     }
@@ -879,7 +891,7 @@ Function Start-Program {
                 $in = Read-HostWithDefault 'Qual a pasta que será utilizada como referência?' '\\ad.ufrgs.br\LITORAL' 
                 $large = Find-LargeFiles $in
                 Foreach ($department In $departments) {
-                    $initials = $department.Sigla.trim()
+                    $initials = $department.GrupoAD.trim()
                     Write-Output "Analisando os maiores arquivos para $initials."
                     $departmentLarge = Set-ObjectToDepartment $large $department.Pasta $departments.Pasta
                     $department | Add-Member Attachment $false
@@ -897,7 +909,7 @@ Function Start-Program {
                     Foreach ($department In $departments) {
                         If ($department.Attachment -ne $false){
                             Write-Host "Enviando e-mail de maiores arquivos para: $($department.Email)."
-                            $initials = $department.Sigla.trim()
+                            $initials = $department.GrupoAD.trim()
                             Send-Email $department.Email 'Relatório de maiores arquivos' "$PSScriptRoot\files\$initials.html" $credencial $department.Attachment
                         }
                     }
