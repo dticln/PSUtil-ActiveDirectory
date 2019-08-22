@@ -1,27 +1,6 @@
-Utility Scripts/relatorio.xlsx
-Utility Scripts/Automated Permission Checker/setores.xlsx
-Utility Scripts/Automated Permission Checker/dti.xlsx
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC NAC DAA.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT CON.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR ADG.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC BIB.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC CEE.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC CGB.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC CGE.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC CGG.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC CPM.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC DID.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC NAC.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC NED.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC NPG.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAC NTC.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAD.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAD NAA.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAD NAA REF.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAD NFI.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAD NGP.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAD NIF.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAD NIF DLG.html
-Utility Scripts/Automated Permission Checker/arquivo/08_10_2018/LIT DGR DAD NIF DTI.html
+Utility Scripts/Automated Permission Checker/files/*.xlsx
+Utility Scripts/Automated Permission Checker/files/*.html
+Utility Scripts/Automated Permission Checker/libraries/*.xlsx
+Utility Scripts/Automated Permission Checker/.vs
+Utility Scripts/.vs/
+
