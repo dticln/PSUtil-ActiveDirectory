@@ -1,9 +1,9 @@
 ﻿# Script Checker
 <# 
 .SYNOPSIS
-Script for automating tasks in Active Directory 
+Script for automating tasks in Active Directory (AD)
 --------------------------------------------------------
-Script para automatização de tarefas no Active Directory
+Script para automatização de tarefas no Active Directory (AD)
 
 .DESCRIPTION
 The script is a set of tools used to automate verification tasks and reporting in Active Directory.
@@ -148,24 +148,35 @@ Function Get-DepartmentFromFile {
 
 <#
 .SYNOPSIS
-Recupera uma lista de membros e subgrupos de um grupo
+Returns a list of members and subgroups of an AD group.
+--------------------------------------------------------
+Retorna uma lista de membros e subgrupos de um grupo AD.
 
 .DESCRIPTION
-Recupera uma lista com membros e subgrupos de um grupo do Active Directory 
-a partir do seu nome 
+Returns a list of members and subgroups of an Active Directory (AD) group from their name.
+--------------------------------------------------------
+Retorna uma lista com membros e subgrupos de um grupo do Active Directory (AD) a partir do seu nome.
 
 .PARAMETER department
-Nome do departamento que deseja realizar a recuperação de membros e subgrupos
+Name of department to search for members and subgroups
+--------------------------------------------------------
+Nome do departamento para o qual buscar membros e subgrupos
 
 .PARAMETER useLimiter
-É possível utilizar o limitador "*Everyone" durante a pesquisa, realizando um filtro
-em possíveis subgrupos com everyone no nome.
-Essa opção é válida na estrutura de pastas utilizada pelo CLN
+You can use the "* Everyone" limiter during the search by performing a filter into possible subgroups with "everyone" in the name.
+This option is valid in the folder structure used by CLN.
+--------------------------------------------------------
+É possível utilizar o limitador "*Everyone" durante a pesquisa, realizando um filtro em possíveis subgrupos com "everyone" no nome.
+Essa opção é válida na estrutura de pastas utilizada pelo CLN.
 
 .EXAMPLE
 Get-ListFromDepartment "LIT DGR Everyone" $true
 
 .NOTES
+There is a recursive call of this function. It must have the default "useLimiter": false.
+The expected result of the function is a Group:
+[PSCustomObject]@{ Nome, Descricao, Subgrupos, Usuarios }
+--------------------------------------------------------
 Há uma chamada recursiva dessa função. Ela deve ter o "useLimiter" padrão: false.
 O resultado esperado da função é um Grupo:
 [PSCustomObject]@{ Nome, Descricao, Subgrupos, Usuarios }
